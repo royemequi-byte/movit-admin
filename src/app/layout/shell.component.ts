@@ -17,9 +17,17 @@ import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/rou
         </div>
 
         <nav class="nav">
+          <a class="nav-item" routerLink="/dashboard" routerLinkActive="active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+            <span>Dashboard</span>
+          </a>
           <a class="nav-item" routerLink="/drivers" routerLinkActive="active">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
             <span>Conductoras</span>
+          </a>
+          <a class="nav-item" routerLink="/trips" routerLinkActive="active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="11" width="20" height="8" rx="2"/><path d="M5 11V8a7 7 0 0 1 14 0v3"/><circle cx="7" cy="18" r="1"/><circle cx="17" cy="18" r="1"/></svg>
+            <span>Viajes</span>
           </a>
           <a class="nav-item" routerLink="/documents/expiring" routerLinkActive="active">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
@@ -46,7 +54,6 @@ import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/rou
       background: #0d0d0d;
       border-right: 1px solid #1e1e1e;
       display: flex; flex-direction: column;
-      padding: 0;
     }
 
     .brand {
@@ -92,10 +99,7 @@ import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/rou
       &:hover { border-color: #ff4444; color: #ff4444; }
     }
 
-    .content {
-      flex: 1; overflow-y: auto;
-      background: #0d0d0d;
-    }
+    .content { flex: 1; overflow-y: auto; background: #0d0d0d; }
   `],
 })
 export class ShellComponent {

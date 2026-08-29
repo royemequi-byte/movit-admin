@@ -36,6 +36,29 @@ export interface Vehicle {
   isActive: boolean;
 }
 
+export interface Trip {
+  id: string;
+  status: 'REQUESTED' | 'ASSIGNED' | 'DRIVER_EN_ROUTE' | 'DRIVER_ARRIVED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+  originAddress: string;
+  destAddress: string;
+  distanceKm?: number;
+  fareEstimated?: number;
+  fareActual?: number;
+  createdAt: string;
+  completedAt?: string;
+  cancelledAt?: string;
+  cancelReason?: string;
+  passenger: { firstName: string; lastName: string; phone: string };
+  driver?: { user: { firstName: string; lastName: string; phone: string } } | null;
+  vehicle?: { type: string; plate: string; brand: string; model: string } | null;
+}
+
+export interface DashboardStats {
+  drivers: { total: number; pending: number; approved: number };
+  trips: { active: number; completedToday: number; cancelledToday: number; total: number };
+  revenue: { today: number };
+}
+
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private http = inject(HttpClient);
@@ -55,6 +78,11 @@ export class ApiService {
     return this.http.post<{ accessToken: string; user: { role: string } }>(
       `${this.base}/auth/verify-otp`, { phone, token }
     );
+  }
+
+  // Admin — dashboard
+  getDashboardStats() {
+    return this.http.get<DashboardStats>(`${this.base}/admin/stats`, { headers: this.headers });
   }
 
   // Admin — drivers
@@ -79,5 +107,20 @@ export class ApiService {
 
   getExpiringDocuments(days = 30) {
     return this.http.get<Document[]>(`${this.base}/admin/documents/expiring?days=${days}`, { headers: this.headers });
+  }
+
+  // Admin — trips
+  getAdminTrips(status?: string, page = 1) {
+    let params = new HttpParams().set('page', page).set('limit', 25);
+    if (status) params = params.set('status', status);
+    return this.http.get<Trip[]>(`${this.base}/admin/trips`, { headers: this.headers, params });
+  }
+
+  getAdminTrip(id: string) {
+    return this.http.get<Trip>(`${this.base}/admin/trips/${id}`, { headers: this.headers });
+  }
+
+  cancelAdminTrip(id: string, reason?: string) {
+    return this.http.post(`${this.base}/admin/trips/${id}/cancel`, { reason }, { headers: this.headers });
   }
 }
