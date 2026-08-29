@@ -1,53 +1,101 @@
 import { Component, inject } from '@angular/core';
 import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatListModule } from '@angular/material/list';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-shell',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, MatToolbarModule, MatSidenavModule, MatListModule, MatIconModule, MatButtonModule],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive],
   template: `
-    <mat-sidenav-container class="sidenav-container">
-      <mat-sidenav mode="side" opened class="sidenav">
-        <div class="brand">MOVIT-FUSA</div>
-        <mat-nav-list>
-          <a mat-list-item routerLink="/drivers" routerLinkActive="active-link">
-            <mat-icon matListItemIcon>people</mat-icon>
-            <span matListItemTitle>Conductoras</span>
-          </a>
-          <a mat-list-item routerLink="/documents/expiring" routerLinkActive="active-link">
-            <mat-icon matListItemIcon>warning</mat-icon>
-            <span matListItemTitle>Vencimientos</span>
-          </a>
-        </mat-nav-list>
-        <div class="sidenav-footer">
-          <button mat-button (click)="logout()">
-            <mat-icon>logout</mat-icon> Salir
-          </button>
+    <div class="shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-logo">M</div>
+          <div class="brand-text">
+            <span class="brand-name">MOVIT<span class="cyan">-FUSA</span></span>
+            <span class="brand-sub">Panel Admin</span>
+          </div>
         </div>
-      </mat-sidenav>
-      <mat-sidenav-content>
-        <mat-toolbar color="primary">
-          <span>Panel de Administración</span>
-        </mat-toolbar>
+
+        <nav class="nav">
+          <a class="nav-item" routerLink="/drivers" routerLinkActive="active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            <span>Conductoras</span>
+          </a>
+          <a class="nav-item" routerLink="/documents/expiring" routerLinkActive="active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span>Vencimientos</span>
+          </a>
+        </nav>
+
+        <button class="logout" (click)="logout()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+          <span>Salir</span>
+        </button>
+      </aside>
+
+      <main class="content">
         <router-outlet />
-      </mat-sidenav-content>
-    </mat-sidenav-container>
+      </main>
+    </div>
   `,
   styles: [`
-    .sidenav-container { height: 100vh; }
-    .sidenav { width: 220px; display: flex; flex-direction: column; background: #1a237e; color: white; }
-    .brand { padding: 20px 16px; font-size: 18px; font-weight: 700; color: white; border-bottom: 1px solid rgba(255,255,255,.15); }
-    mat-nav-list { flex: 1; }
-    .active-link { background: rgba(255,255,255,.15) !important; }
-    mat-icon, span { color: white !important; }
-    .sidenav-footer { padding: 12px; border-top: 1px solid rgba(255,255,255,.15); }
-    .sidenav-footer button { color: white; width: 100%; }
-    mat-toolbar { position: sticky; top: 0; z-index: 1; }
+    .shell { display: flex; height: 100vh; overflow: hidden; }
+
+    .sidebar {
+      width: 240px; min-width: 240px;
+      background: #0d0d0d;
+      border-right: 1px solid #1e1e1e;
+      display: flex; flex-direction: column;
+      padding: 0;
+    }
+
+    .brand {
+      display: flex; align-items: center; gap: 12px;
+      padding: 24px 20px;
+      border-bottom: 1px solid #1e1e1e;
+    }
+    .brand-logo {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: #00d4e8; color: #000;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Rajdhani', sans-serif; font-size: 20px; font-weight: 700;
+      box-shadow: 0 0 12px rgba(0,212,232,.5);
+      flex-shrink: 0;
+    }
+    .brand-name {
+      font-family: 'Rajdhani', sans-serif; font-size: 17px;
+      font-weight: 700; letter-spacing: 1px; color: #fff;
+    }
+    .brand-sub { font-size: 11px; color: #666; letter-spacing: .5px; display: block; margin-top: 1px; }
+    .cyan { color: #00d4e8; }
+
+    .nav { flex: 1; padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; }
+
+    .nav-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 14px; border-radius: 8px;
+      color: #888; text-decoration: none;
+      font-size: 14px; font-weight: 500;
+      transition: background .15s, color .15s;
+      svg { width: 18px; height: 18px; flex-shrink: 0; }
+      &:hover { background: #161616; color: #ccc; }
+      &.active { background: rgba(0,212,232,.08); color: #00d4e8; border-left: 2px solid #00d4e8; }
+    }
+
+    .logout {
+      display: flex; align-items: center; gap: 10px;
+      margin: 16px 12px; padding: 11px 14px;
+      background: none; border: 1px solid #252525;
+      border-radius: 8px; color: #666; cursor: pointer;
+      font-size: 14px; transition: border-color .2s, color .2s;
+      svg { width: 16px; height: 16px; }
+      &:hover { border-color: #ff4444; color: #ff4444; }
+    }
+
+    .content {
+      flex: 1; overflow-y: auto;
+      background: #0d0d0d;
+    }
   `],
 })
 export class ShellComponent {

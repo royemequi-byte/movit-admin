@@ -1,9 +1,5 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { DatePipe } from '@angular/common';
-import { MatTableModule } from '@angular/material/table';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatChipsModule } from '@angular/material/chips';
 import { ApiService, Document } from '../../core/services/api.service';
 
 interface ExpiringDoc extends Document {
@@ -13,61 +9,93 @@ interface ExpiringDoc extends Document {
 @Component({
   selector: 'app-expiring-docs',
   standalone: true,
-  imports: [DatePipe, MatTableModule, MatIconModule, MatProgressSpinnerModule, MatChipsModule],
+  imports: [DatePipe],
   template: `
     <div class="page-container">
-      <h1><mat-icon color="warn">warning</mat-icon> Documentos próximos a vencer (30 días)</h1>
+      <div>
+        <h1 class="page-title">VENCI<span>MIENTOS</span></h1>
+        <div class="cyan-divider"></div>
+        <p class="subtitle">Documentos que vencen en los próximos 30 días</p>
+      </div>
 
       @if (loading()) {
-        <div class="center"><mat-spinner /></div>
+        <div class="mv-spinner"><div class="spinner"></div></div>
+      } @else if (docs().length === 0) {
+        <div class="mv-card mv-empty" style="border-color: rgba(0,230,118,.2);">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#00e676" stroke-width="2" style="width:32px;height:32px;margin-bottom:8px"><polyline points="20 6 9 17 4 12"/></svg>
+          <div>Sin documentos próximos a vencer</div>
+        </div>
       } @else {
-        <table mat-table [dataSource]="docs()" class="mat-elevation-z2">
-          <ng-container matColumnDef="driver">
-            <th mat-header-cell *matHeaderCellDef>Conductora</th>
-            <td mat-cell *matCellDef="let d">{{ d.driver.user.firstName }} {{ d.driver.user.lastName }}</td>
-          </ng-container>
-          <ng-container matColumnDef="phone">
-            <th mat-header-cell *matHeaderCellDef>Teléfono</th>
-            <td mat-cell *matCellDef="let d">{{ d.driver.user.phone }}</td>
-          </ng-container>
-          <ng-container matColumnDef="type">
-            <th mat-header-cell *matHeaderCellDef>Documento</th>
-            <td mat-cell *matCellDef="let d">{{ d.type }}</td>
-          </ng-container>
-          <ng-container matColumnDef="expires">
-            <th mat-header-cell *matHeaderCellDef>Vence</th>
-            <td mat-cell *matCellDef="let d" [class.urgent]="isUrgent(d.expiresAt)">
-              {{ d.expiresAt | date:'dd/MM/yyyy' }}
-            </td>
-          </ng-container>
-          <ng-container matColumnDef="file">
-            <th mat-header-cell *matHeaderCellDef></th>
-            <td mat-cell *matCellDef="let d">
-              <a [href]="d.fileUrl" target="_blank" mat-icon-button><mat-icon>open_in_new</mat-icon></a>
-            </td>
-          </ng-container>
-          <tr mat-header-row *matHeaderRowDef="cols"></tr>
-          <tr mat-row *matRowDef="let row; columns: cols;"></tr>
-        </table>
-        @if (docs().length === 0) {
-          <p class="empty">No hay documentos próximos a vencer. ✓</p>
-        }
+        <div class="counter-row">
+          <div class="counter urgent-counter">{{ urgentCount() }} <span>urgentes (< 7 días)</span></div>
+          <div class="counter">{{ docs().length }} <span>total</span></div>
+        </div>
+        <div class="mv-card" style="padding: 0; overflow: hidden;">
+          <table class="mv-table">
+            <thead>
+              <tr>
+                <th>Conductora</th>
+                <th>Teléfono</th>
+                <th>Documento</th>
+                <th>Vence</th>
+                <th>Urgencia</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (d of docs(); track d.id) {
+                <tr [class.urgent-row]="isUrgent(d.expiresAt)">
+                  <td>{{ d.driver.user.firstName }} {{ d.driver.user.lastName }}</td>
+                  <td>{{ d.driver.user.phone }}</td>
+                  <td>{{ docTypeLabel(d.type) }}</td>
+                  <td [class.urgent-date]="isUrgent(d.expiresAt)">
+                    {{ d.expiresAt | date:'dd/MM/yyyy' }}
+                  </td>
+                  <td>
+                    @if (isUrgent(d.expiresAt)) {
+                      <span class="status-badge SUSPENDED">Urgente</span>
+                    } @else {
+                      <span class="status-badge PENDING">Pronto</span>
+                    }
+                  </td>
+                  <td>
+                    @if (d.fileUrl) {
+                      <a [href]="d.fileUrl" target="_blank" class="btn-view">Ver doc</a>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
       }
     </div>
   `,
   styles: [`
-    h1 { display: flex; align-items: center; gap: 8px; font-size: 22px; margin-bottom: 16px; }
-    table { width: 100%; }
-    .center { display: flex; justify-content: center; padding: 48px; }
-    .empty { text-align: center; padding: 32px; color: #2e7d32; font-size: 16px; }
-    .urgent { color: #c62828; font-weight: bold; }
+    .subtitle { font-size: 13px; color: #666; margin-top: -12px; margin-bottom: 24px; }
+    .counter-row { display: flex; gap: 16px; margin-bottom: 16px; }
+    .counter {
+      padding: 10px 20px; background: #161616; border: 1px solid #252525; border-radius: 8px;
+      font-family: 'Rajdhani', sans-serif; font-size: 28px; font-weight: 700; color: #fff;
+      span { font-size: 12px; color: #666; margin-left: 6px; font-family: 'Roboto', sans-serif; font-weight: 400; }
+    }
+    .urgent-counter { border-color: rgba(255,68,68,.3); color: #ff4444; }
+    .urgent-row td { background: rgba(255,68,68,.03); }
+    .urgent-date { color: #ff4444; font-weight: 600; }
+    .btn-view {
+      padding: 5px 12px; border-radius: 6px;
+      background: rgba(0,212,232,.08); color: #00d4e8;
+      border: 1px solid rgba(0,212,232,.25);
+      font-size: 12px; font-weight: 600; text-decoration: none;
+      transition: background .2s;
+      &:hover { background: rgba(0,212,232,.18); }
+    }
   `],
 })
 export class ExpiringDocsComponent implements OnInit {
   private api = inject(ApiService);
   docs = signal<ExpiringDoc[]>([]);
   loading = signal(true);
-  cols = ['driver', 'phone', 'type', 'expires', 'file'];
 
   ngOnInit() {
     this.api.getExpiringDocuments(30).subscribe({
@@ -78,7 +106,18 @@ export class ExpiringDocsComponent implements OnInit {
 
   isUrgent(date?: string) {
     if (!date) return false;
-    const diff = new Date(date).getTime() - Date.now();
-    return diff < 7 * 24 * 60 * 60 * 1000;
+    return new Date(date).getTime() - Date.now() < 7 * 24 * 60 * 60 * 1000;
+  }
+
+  urgentCount() {
+    return this.docs().filter(d => this.isUrgent(d.expiresAt)).length;
+  }
+
+  docTypeLabel(type: string) {
+    const map: Record<string, string> = {
+      SOAT: 'SOAT', LICENSE: 'Licencia', TECH_REVIEW: 'Revisión técnica',
+      INSURANCE: 'Seguro', PROPERTY_CARD: 'Tarjeta de propiedad',
+    };
+    return map[type] ?? type;
   }
 }

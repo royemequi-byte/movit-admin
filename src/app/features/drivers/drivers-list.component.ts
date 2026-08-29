@@ -1,84 +1,84 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { MatTableModule } from '@angular/material/table';
-import { MatButtonModule } from '@angular/material/button';
-import { MatSelectModule } from '@angular/material/select';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatIconModule } from '@angular/material/icon';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ApiService, Driver } from '../../core/services/api.service';
 
 @Component({
   selector: 'app-drivers-list',
   standalone: true,
-  imports: [RouterLink, FormsModule, MatTableModule, MatButtonModule, MatSelectModule, MatFormFieldModule, MatIconModule, MatProgressSpinnerModule],
+  imports: [RouterLink, FormsModule],
   template: `
     <div class="page-container">
-      <div class="header-row">
-        <h1>Conductoras</h1>
-        <mat-form-field appearance="outline" class="filter">
-          <mat-label>Filtrar estado</mat-label>
-          <mat-select [(ngModel)]="statusFilter" (ngModelChange)="load()">
-            <mat-option value="">Todos</mat-option>
-            <mat-option value="PENDING">Pendientes</mat-option>
-            <mat-option value="APPROVED">Aprobadas</mat-option>
-            <mat-option value="SUSPENDED">Suspendidas</mat-option>
-            <mat-option value="REJECTED">Rechazadas</mat-option>
-          </mat-select>
-        </mat-form-field>
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">CONDUCTO<span>RAS</span></h1>
+          <div class="cyan-divider"></div>
+        </div>
+        <select class="mv-select" [(ngModel)]="statusFilter" (ngModelChange)="load()">
+          <option value="">Todos los estados</option>
+          <option value="PENDING">Pendientes</option>
+          <option value="APPROVED">Aprobadas</option>
+          <option value="SUSPENDED">Suspendidas</option>
+          <option value="REJECTED">Rechazadas</option>
+        </select>
       </div>
 
       @if (loading()) {
-        <div class="center"><mat-spinner /></div>
+        <div class="mv-spinner"><div class="spinner"></div></div>
+      } @else if (drivers().length === 0) {
+        <div class="mv-card mv-empty">No hay conductoras con este filtro.</div>
       } @else {
-        <table mat-table [dataSource]="drivers()" class="mat-elevation-z2">
-          <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef>Nombre</th>
-            <td mat-cell *matCellDef="let d">{{ d.user.firstName }} {{ d.user.lastName }}</td>
-          </ng-container>
-          <ng-container matColumnDef="phone">
-            <th mat-header-cell *matHeaderCellDef>Teléfono</th>
-            <td mat-cell *matCellDef="let d">{{ d.user.phone }}</td>
-          </ng-container>
-          <ng-container matColumnDef="status">
-            <th mat-header-cell *matHeaderCellDef>Estado</th>
-            <td mat-cell *matCellDef="let d">
-              <span class="status-badge {{ d.status }}">{{ d.status }}</span>
-            </td>
-          </ng-container>
-          <ng-container matColumnDef="docs">
-            <th mat-header-cell *matHeaderCellDef>Docs</th>
-            <td mat-cell *matCellDef="let d">{{ d.documents.length }}</td>
-          </ng-container>
-          <ng-container matColumnDef="vehicles">
-            <th mat-header-cell *matHeaderCellDef>Vehículos</th>
-            <td mat-cell *matCellDef="let d">{{ d.vehicles.length }}</td>
-          </ng-container>
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef></th>
-            <td mat-cell *matCellDef="let d">
-              <a mat-icon-button [routerLink]="['/drivers', d.id]" color="primary">
-                <mat-icon>visibility</mat-icon>
-              </a>
-            </td>
-          </ng-container>
-          <tr mat-header-row *matHeaderRowDef="cols"></tr>
-          <tr mat-row *matRowDef="let row; columns: cols;"></tr>
-        </table>
-        @if (drivers().length === 0) {
-          <p class="empty">No hay conductoras con este filtro.</p>
-        }
+        <div class="mv-card" style="padding: 0; overflow: hidden;">
+          <table class="mv-table">
+            <thead>
+              <tr>
+                <th>Conductora</th>
+                <th>Teléfono</th>
+                <th>Estado</th>
+                <th>Docs</th>
+                <th>Vehículos</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (d of drivers(); track d.id) {
+                <tr>
+                  <td>
+                    <div class="driver-name">{{ d.user.firstName }} {{ d.user.lastName }}</div>
+                    @if (d.user.email) { <div class="driver-email">{{ d.user.email }}</div> }
+                  </td>
+                  <td>{{ d.user.phone }}</td>
+                  <td><span class="status-badge {{ d.status }}">{{ statusLabel(d.status) }}</span></td>
+                  <td>{{ d.documents.length }}</td>
+                  <td>{{ d.vehicles.length }}</td>
+                  <td>
+                    <a class="btn-view" [routerLink]="['/drivers', d.id]">Ver</a>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
       }
     </div>
   `,
   styles: [`
-    .header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    h1 { font-size: 24px; font-weight: 500; }
-    .filter { width: 200px; }
-    table { width: 100%; }
-    .center { display: flex; justify-content: center; padding: 48px; }
-    .empty { text-align: center; padding: 32px; color: #666; }
+    .page-header {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 8px;
+    }
+    .driver-name { font-weight: 500; }
+    .driver-email { font-size: 12px; color: #666; margin-top: 2px; }
+    .btn-view {
+      padding: 6px 14px; border-radius: 6px;
+      background: rgba(0,212,232,.1); color: #00d4e8;
+      border: 1px solid rgba(0,212,232,.3);
+      font-size: 12px; font-weight: 600;
+      text-decoration: none; cursor: pointer;
+      letter-spacing: .5px;
+      transition: background .2s, box-shadow .2s;
+      &:hover { background: rgba(0,212,232,.2); box-shadow: 0 0 8px rgba(0,212,232,.3); }
+    }
   `],
 })
 export class DriversListComponent implements OnInit {
@@ -86,7 +86,6 @@ export class DriversListComponent implements OnInit {
   drivers = signal<Driver[]>([]);
   loading = signal(true);
   statusFilter = '';
-  cols = ['name', 'phone', 'status', 'docs', 'vehicles', 'actions'];
 
   ngOnInit() { this.load(); }
 
@@ -96,5 +95,13 @@ export class DriversListComponent implements OnInit {
       next: (d) => { this.drivers.set(d); this.loading.set(false); },
       error: () => this.loading.set(false),
     });
+  }
+
+  statusLabel(s: string) {
+    const map: Record<string, string> = {
+      PENDING: 'Pendiente', APPROVED: 'Aprobada',
+      SUSPENDED: 'Suspendida', REJECTED: 'Rechazada',
+    };
+    return map[s] ?? s;
   }
 }
