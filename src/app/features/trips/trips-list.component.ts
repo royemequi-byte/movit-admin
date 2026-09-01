@@ -37,8 +37,8 @@ type TripStatus = Trip['status'];
           <table class="mv-table">
             <thead>
               <tr>
-                <th>Pasajera</th>
-                <th>Conductora</th>
+                <th>Pasajero/a</th>
+                <th>Conductor/a</th>
                 <th>Origen</th>
                 <th>Destino</th>
                 <th>Km</th>

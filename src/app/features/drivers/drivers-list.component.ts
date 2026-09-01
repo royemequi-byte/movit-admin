@@ -26,13 +26,13 @@ import { ApiService, Driver } from '../../core/services/api.service';
       @if (loading()) {
         <div class="mv-spinner"><div class="spinner"></div></div>
       } @else if (drivers().length === 0) {
-        <div class="mv-card mv-empty">No hay conductoras con este filtro.</div>
+        <div class="mv-card mv-empty">No hay conductores con este filtro.</div>
       } @else {
         <div class="mv-card" style="padding: 0; overflow: hidden;">
           <table class="mv-table">
             <thead>
               <tr>
-                <th>Conductora</th>
+                <th>Conductor/a</th>
                 <th>Teléfono</th>
                 <th>Estado</th>
                 <th>Docs</th>

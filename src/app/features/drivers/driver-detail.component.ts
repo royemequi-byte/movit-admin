@@ -11,7 +11,7 @@ import { ApiService, Driver } from '../../core/services/api.service';
     <div class="page-container">
       <a class="back-link" routerLink="/drivers">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
-        Volver a conductoras
+        Volver a conductores
       </a>
 
       @if (loading()) {
@@ -123,7 +123,7 @@ import { ApiService, Driver } from '../../core/services/api.service';
           </div>
         </div>
       } @else {
-        <div class="mv-card mv-empty">Conductora no encontrada.</div>
+        <div class="mv-card mv-empty">Conductor/a no encontrado/a.</div>
       }
     </div>
   `,

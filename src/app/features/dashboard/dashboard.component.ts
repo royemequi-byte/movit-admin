@@ -51,27 +51,27 @@ import { DatePipe } from '@angular/common';
             </div>
           </div>
 
-          <!-- Conductoras pendientes -->
+          <!-- Conductores pendientes -->
           <div class="kpi-card kpi-warning">
             <div class="kpi-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
             </div>
             <div>
               <div class="kpi-val">{{ stats()!.drivers.pending }}</div>
-              <div class="kpi-label">Conductoras pendientes</div>
+              <div class="kpi-label">Conductores pendientes</div>
               <a class="kpi-action" routerLink="/drivers" [queryParams]="{status:'PENDING'}">Revisar →</a>
             </div>
           </div>
 
-          <!-- Total conductoras -->
+          <!-- Total conductores -->
           <div class="kpi-card">
             <div class="kpi-icon cyan-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
             </div>
             <div>
               <div class="kpi-val">{{ stats()!.drivers.approved }}</div>
-              <div class="kpi-label">Conductoras activas</div>
-              <div class="kpi-sub">{{ stats()!.drivers.total }} registradas total</div>
+              <div class="kpi-label">Conductores activos</div>
+              <div class="kpi-sub">{{ stats()!.drivers.total }} registrados total</div>
             </div>
           </div>
 
@@ -100,8 +100,8 @@ import { DatePipe } from '@angular/common';
               <table class="mv-table">
                 <thead>
                   <tr>
-                    <th>Pasajera</th>
-                    <th>Conductora</th>
+                    <th>Pasajero/a</th>
+                    <th>Conductor/a</th>
                     <th>Ruta</th>
                     <th>Tarifa</th>
                     <th>Estado</th>

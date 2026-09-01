@@ -34,7 +34,7 @@ interface ExpiringDoc extends Document {
           <table class="mv-table">
             <thead>
               <tr>
-                <th>Conductora</th>
+                <th>Conductor/a</th>
                 <th>Teléfono</th>
                 <th>Documento</th>
                 <th>Vence</th>
