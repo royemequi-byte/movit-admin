@@ -79,6 +79,29 @@ export interface FareConfigInput {
   nightMultiplier: number;
 }
 
+export interface PriceDestination {
+  id: string;
+  name: string;
+  section: string;
+  price: number;
+  isActive: boolean;
+}
+
+export interface Campaign {
+  id: string;
+  name: string;
+  discountType: 'PERCENT' | 'FIXED';
+  discountValue: number;
+  maxFareAmount: number | null;
+  daysOfWeek: number[];
+  startHour: number | null;
+  endHour: number | null;
+  startsAt: string | null;
+  endsAt: string | null;
+  isActive: boolean;
+  createdAt: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private http = inject(HttpClient);
@@ -151,5 +174,39 @@ export class ApiService {
 
   upsertFareConfig(input: FareConfigInput) {
     return this.http.post<FareConfig>(`${this.base}/admin/fare-config`, input, { headers: this.headers });
+  }
+
+  // Admin — price destinations
+  getPriceDestinations() {
+    return this.http.get<PriceDestination[]>(`${this.base}/admin/price-destinations`, { headers: this.headers });
+  }
+
+  createPriceDestination(data: { name: string; section: string; price: number }) {
+    return this.http.post<PriceDestination>(`${this.base}/admin/price-destinations`, data, { headers: this.headers });
+  }
+
+  updatePriceDestination(id: string, data: Partial<{ name: string; section: string; price: number }>) {
+    return this.http.patch<PriceDestination>(`${this.base}/admin/price-destinations/${id}`, data, { headers: this.headers });
+  }
+
+  deletePriceDestination(id: string) {
+    return this.http.delete(`${this.base}/admin/price-destinations/${id}`, { headers: this.headers });
+  }
+
+  // Admin — campaigns
+  getCampaigns() {
+    return this.http.get<Campaign[]>(`${this.base}/admin/campaigns`, { headers: this.headers });
+  }
+
+  createCampaign(data: object) {
+    return this.http.post<Campaign>(`${this.base}/admin/campaigns`, data, { headers: this.headers });
+  }
+
+  updateCampaign(id: string, data: object) {
+    return this.http.patch<Campaign>(`${this.base}/admin/campaigns/${id}`, data, { headers: this.headers });
+  }
+
+  deleteCampaign(id: string) {
+    return this.http.delete(`${this.base}/admin/campaigns/${id}`, { headers: this.headers });
   }
 }

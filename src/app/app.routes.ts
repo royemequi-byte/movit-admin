@@ -15,6 +15,8 @@ export const routes: Routes = [
       { path: 'documents/expiring', loadComponent: () => import('./features/documents/expiring-docs.component').then(m => m.ExpiringDocsComponent) },
       { path: 'trips', loadComponent: () => import('./features/trips/trips-list.component').then(m => m.TripsListComponent) },
       { path: 'tarifas', loadComponent: () => import('./features/tarifas/tarifas.component').then(m => m.TarifasComponent) },
+      { path: 'precios', loadComponent: () => import('./features/precios/precios.component').then(m => m.PreciosAdminComponent) },
+      { path: 'campanas', loadComponent: () => import('./features/campanas/campanas.component').then(m => m.CampanasComponent) },
     ],
   },
   { path: '**', redirectTo: 'login' },
