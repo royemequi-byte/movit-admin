@@ -14,6 +14,7 @@ export const routes: Routes = [
       { path: 'drivers/:id', loadComponent: () => import('./features/drivers/driver-detail.component').then(m => m.DriverDetailComponent) },
       { path: 'documents/expiring', loadComponent: () => import('./features/documents/expiring-docs.component').then(m => m.ExpiringDocsComponent) },
       { path: 'trips', loadComponent: () => import('./features/trips/trips-list.component').then(m => m.TripsListComponent) },
+      { path: 'tarifas', loadComponent: () => import('./features/tarifas/tarifas.component').then(m => m.TarifasComponent) },
     ],
   },
   { path: '**', redirectTo: 'login' },

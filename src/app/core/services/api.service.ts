@@ -59,6 +59,26 @@ export interface DashboardStats {
   revenue: { today: number };
 }
 
+export interface FareConfig {
+  id: string;
+  vehicleType: 'CAR' | 'MOTORCYCLE';
+  baseAmount: number;
+  perKmAmount: number;
+  perMinuteAmount: number;
+  minimumAmount: number;
+  nightMultiplier: number;
+  isActive: boolean;
+}
+
+export interface FareConfigInput {
+  vehicleType: 'CAR' | 'MOTORCYCLE';
+  baseAmount: number;
+  perKmAmount: number;
+  perMinuteAmount: number;
+  minimumAmount: number;
+  nightMultiplier: number;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private http = inject(HttpClient);
@@ -122,5 +142,14 @@ export class ApiService {
 
   cancelAdminTrip(id: string, reason?: string) {
     return this.http.post(`${this.base}/admin/trips/${id}/cancel`, { reason }, { headers: this.headers });
+  }
+
+  // Admin — fare config
+  getFareConfig() {
+    return this.http.get<FareConfig[]>(`${this.base}/admin/fare-config`, { headers: this.headers });
+  }
+
+  upsertFareConfig(input: FareConfigInput) {
+    return this.http.post<FareConfig>(`${this.base}/admin/fare-config`, input, { headers: this.headers });
   }
 }
