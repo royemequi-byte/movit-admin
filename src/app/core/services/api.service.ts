@@ -87,6 +87,46 @@ export interface PriceDestination {
   isActive: boolean;
 }
 
+export interface AppConfig {
+  id: string;
+  assignmentRadiusKm: number;
+  assignmentTimeoutSec: number;
+  maxSearchRadiusKm: number;
+  updatedAt: string;
+}
+
+export interface LiveDriver {
+  id: string;
+  currentLat: number;
+  currentLng: number;
+  isAvailable: boolean;
+  lastSeenAt: string | null;
+  user: { firstName: string; lastName: string; phone: string };
+}
+
+export interface LiveTrip {
+  id: string;
+  status: string;
+  originLat: number;
+  originLng: number;
+  destLat: number;
+  destLng: number;
+  originAddress: string;
+  destAddress: string;
+  passenger: { firstName: string; lastName: string; phone: string };
+  driver: { user: { firstName: string; lastName: string } } | null;
+}
+
+export interface Rating {
+  id: string;
+  score: number;
+  comment: string | null;
+  createdAt: string;
+  rater: { firstName: string; lastName: string };
+  rated: { firstName: string; lastName: string };
+  trip: { originAddress: string; destAddress: string };
+}
+
 export interface Campaign {
   id: string;
   name: string;
@@ -208,5 +248,27 @@ export class ApiService {
 
   deleteCampaign(id: string) {
     return this.http.delete(`${this.base}/admin/campaigns/${id}`, { headers: this.headers });
+  }
+
+  // Admin — app config
+  getAppConfig() {
+    return this.http.get<AppConfig>(`${this.base}/admin/app-config`, { headers: this.headers });
+  }
+
+  updateAppConfig(data: Partial<Omit<AppConfig, 'id' | 'updatedAt'>>) {
+    return this.http.patch<AppConfig>(`${this.base}/admin/app-config`, data, { headers: this.headers });
+  }
+
+  // Admin — live map
+  getLiveMap() {
+    return this.http.get<{ drivers: LiveDriver[]; trips: LiveTrip[] }>(`${this.base}/admin/live-map`, { headers: this.headers });
+  }
+
+  // Admin — ratings
+  getRatings(page = 1, limit = 20) {
+    const params = new HttpParams().set('page', page).set('limit', limit);
+    return this.http.get<{ ratings: Rating[]; total: number; page: number; limit: number }>(
+      `${this.base}/admin/ratings`, { headers: this.headers, params }
+    );
   }
 }

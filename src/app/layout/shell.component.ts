@@ -45,6 +45,19 @@ import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/rou
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
             <span>Campañas</span>
           </a>
+          <div class="nav-sep"></div>
+          <a class="nav-item" routerLink="/mapa" routerLinkActive="active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+            <span>Mapa live</span>
+          </a>
+          <a class="nav-item" routerLink="/calificaciones" routerLinkActive="active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            <span>Calificaciones</span>
+          </a>
+          <a class="nav-item" routerLink="/config" routerLinkActive="active">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2"/></svg>
+            <span>Configuración</span>
+          </a>
         </nav>
 
         <button class="logout" (click)="logout()">
@@ -100,6 +113,8 @@ import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/rou
       &:hover { background: #161616; color: #ccc; }
       &.active { background: rgba(0,212,232,.08); color: #00d4e8; border-left: 2px solid #00d4e8; }
     }
+
+    .nav-sep { height: 1px; background: #1e1e1e; margin: 8px 12px; }
 
     .logout {
       display: flex; align-items: center; gap: 10px;

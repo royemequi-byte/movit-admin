@@ -11,15 +11,15 @@ import { ApiService, Driver } from '../../core/services/api.service';
     <div class="page-container">
       <div class="page-header">
         <div>
-          <h1 class="page-title">CONDUCTO<span>RAS</span></h1>
+          <h1 class="page-title">CONDUCTO<span>RES</span></h1>
           <div class="cyan-divider"></div>
         </div>
         <select class="mv-select" [(ngModel)]="statusFilter" (ngModelChange)="load()">
           <option value="">Todos los estados</option>
           <option value="PENDING">Pendientes</option>
-          <option value="APPROVED">Aprobadas</option>
-          <option value="SUSPENDED">Suspendidas</option>
-          <option value="REJECTED">Rechazadas</option>
+          <option value="APPROVED">Aprobados/as</option>
+          <option value="SUSPENDED">Suspendidos/as</option>
+          <option value="REJECTED">Rechazados/as</option>
         </select>
       </div>
 
@@ -99,8 +99,8 @@ export class DriversListComponent implements OnInit {
 
   statusLabel(s: string) {
     const map: Record<string, string> = {
-      PENDING: 'Pendiente', APPROVED: 'Aprobada',
-      SUSPENDED: 'Suspendida', REJECTED: 'Rechazada',
+      PENDING: 'Pendiente', APPROVED: 'Aprobado/a',
+      SUSPENDED: 'Suspendido/a', REJECTED: 'Rechazado/a',
     };
     return map[s] ?? s;
   }

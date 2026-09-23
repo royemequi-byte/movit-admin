@@ -248,8 +248,8 @@ export class DriverDetailComponent implements OnInit {
 
   statusLabel(s: string) {
     const map: Record<string, string> = {
-      PENDING: 'Pendiente', APPROVED: 'Aprobada',
-      SUSPENDED: 'Suspendida', REJECTED: 'Rechazada',
+      PENDING: 'Pendiente', APPROVED: 'Aprobado/a',
+      SUSPENDED: 'Suspendido/a', REJECTED: 'Rechazado/a',
     };
     return map[s] ?? s;
   }
