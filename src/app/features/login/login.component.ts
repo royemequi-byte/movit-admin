@@ -11,10 +11,10 @@ import { ApiService } from '../../core/services/api.service';
     <div class="login-bg">
       <div class="login-card">
         <div class="logo-ring">
-          <span>M</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5" fill="currentColor" stroke="none"/></svg>
         </div>
-        <h1 class="brand">MOVIT<span>-FUSA</span></h1>
-        <p class="slogan">TU VIAJE, NUESTRA PRIORIDAD</p>
+        <h1 class="brand">ADVANCE<span> 24</span></h1>
+        <p class="slogan">TU VIAJE · NUESTRA PRIORIDAD</p>
         <div class="divider"></div>
 
         @if (!otpSent()) {
@@ -48,8 +48,6 @@ import { ApiService } from '../../core/services/api.service';
     </div>
   `,
   styles: [`
-    @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@700&display=swap');
-
     .login-bg {
       min-height: 100vh;
       background: radial-gradient(ellipse at center, #0f1a1f 0%, #0d0d0d 70%);
@@ -67,21 +65,20 @@ import { ApiService } from '../../core/services/api.service';
     }
 
     .logo-ring {
-      width: 72px; height: 72px; border-radius: 50%;
+      width: 80px; height: 80px; border-radius: 50%;
       border: 2px solid #00d4e8;
-      box-shadow: 0 0 20px rgba(0,212,232,.4), inset 0 0 20px rgba(0,212,232,.05);
+      background: linear-gradient(135deg, #001a4d, #003080);
+      box-shadow: 0 0 28px rgba(0,212,232,.5), 0 0 50px rgba(0,48,128,.3);
       display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 16px;
-      span {
-        font-family: 'Rajdhani', sans-serif;
-        font-size: 32px; font-weight: 700; color: #00d4e8;
-      }
+      margin: 0 auto 20px;
+      color: #00d4e8;
+      svg { width: 38px; height: 38px; }
     }
 
     .brand {
-      font-family: 'Rajdhani', sans-serif;
-      font-size: 28px; font-weight: 700;
-      color: #fff; letter-spacing: 2px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 26px; font-weight: 900;
+      color: #fff; letter-spacing: 3px;
       span { color: #00d4e8; }
     }
 
@@ -117,7 +114,7 @@ import { ApiService } from '../../core/services/api.service';
       width: 100%; padding: 13px;
       background: #00d4e8; color: #000;
       border: none; border-radius: 8px;
-      font-family: 'Rajdhani', sans-serif;
+      font-family: 'Orbitron', sans-serif;
       font-size: 15px; font-weight: 700; letter-spacing: 1px;
       cursor: pointer; text-transform: uppercase;
       transition: box-shadow .2s, transform .1s;

@@ -9,9 +9,11 @@ import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/rou
     <div class="shell">
       <aside class="sidebar">
         <div class="brand">
-          <div class="brand-logo">M</div>
+          <div class="brand-logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/><circle cx="12" cy="9" r="2.5" fill="currentColor" stroke="none"/></svg>
+          </div>
           <div class="brand-text">
-            <span class="brand-name">MOVIT<span class="cyan">-FUSA</span></span>
+            <span class="brand-name">ADVANCE<span class="cyan"> 24</span></span>
             <span class="brand-sub">Panel Admin</span>
           </div>
         </div>
@@ -88,15 +90,17 @@ import { Router, RouterOutlet, RouterLink, RouterLinkActive } from '@angular/rou
     }
     .brand-logo {
       width: 38px; height: 38px; border-radius: 50%;
-      background: #00d4e8; color: #000;
+      background: linear-gradient(135deg, #001a4d, #003080);
+      border: 2px solid #00d4e8;
       display: flex; align-items: center; justify-content: center;
-      font-family: 'Rajdhani', sans-serif; font-size: 20px; font-weight: 700;
-      box-shadow: 0 0 12px rgba(0,212,232,.5);
+      color: #00d4e8;
+      box-shadow: 0 0 14px rgba(0,212,232,.5);
       flex-shrink: 0;
+      svg { width: 20px; height: 20px; }
     }
     .brand-name {
-      font-family: 'Rajdhani', sans-serif; font-size: 17px;
-      font-weight: 700; letter-spacing: 1px; color: #fff;
+      font-family: 'Orbitron', sans-serif; font-size: 14px;
+      font-weight: 800; letter-spacing: 1px; color: #fff;
     }
     .brand-sub { font-size: 11px; color: #666; letter-spacing: .5px; display: block; margin-top: 1px; }
     .cyan { color: #00d4e8; }
