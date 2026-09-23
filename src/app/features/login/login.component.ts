@@ -17,27 +17,26 @@ import { ApiService } from '../../core/services/api.service';
         <p class="slogan">TU VIAJE · NUESTRA PRIORIDAD</p>
         <div class="divider"></div>
 
-        @if (!otpSent()) {
-          <div class="field">
-            <label>Teléfono</label>
-            <input class="mv-input" [(ngModel)]="phone" type="tel"
-              placeholder="+573001234567" (keyup.enter)="sendOtp()">
+        <div class="field">
+          <label>Usuario</label>
+          <input class="mv-input" [(ngModel)]="username" type="text"
+            placeholder="advance24" autocomplete="username" (keyup.enter)="login()">
+        </div>
+        <div class="field">
+          <label>Contraseña</label>
+          <div class="pass-wrap">
+            <input class="mv-input" [(ngModel)]="password"
+              [type]="showPass ? 'text' : 'password'"
+              placeholder="••••••••" autocomplete="current-password" (keyup.enter)="login()">
+            <button class="pass-toggle" type="button" (click)="showPass = !showPass">
+              {{ showPass ? '🙈' : '👁️' }}
+            </button>
           </div>
-          <button class="btn-cyan" (click)="sendOtp()" [disabled]="loading()">
-            {{ loading() ? 'ENVIANDO...' : 'ENVIAR CÓDIGO' }}
-          </button>
-        } @else {
-          <p class="hint">Código enviado a <strong>{{ phone }}</strong></p>
-          <div class="field">
-            <label>Código OTP</label>
-            <input class="mv-input otp-input" [(ngModel)]="otp" type="text"
-              maxlength="6" placeholder="000000" (keyup.enter)="verifyOtp()">
-          </div>
-          <button class="btn-cyan" (click)="verifyOtp()" [disabled]="loading()">
-            {{ loading() ? 'VERIFICANDO...' : 'INGRESAR' }}
-          </button>
-          <button class="btn-back" (click)="otpSent.set(false)">← Cambiar número</button>
-        }
+        </div>
+
+        <button class="btn-cyan" (click)="login()" [disabled]="loading()">
+          {{ loading() ? 'VERIFICANDO...' : 'INGRESAR' }}
+        </button>
 
         @if (error()) {
           <p class="error-msg">{{ error() }}</p>
@@ -108,7 +107,11 @@ import { ApiService } from '../../core/services/api.service';
       &:focus { border-color: #00d4e8; box-shadow: 0 0 0 3px rgba(0,212,232,.1); }
     }
 
-    .otp-input { text-align: center; font-size: 22px; letter-spacing: 8px; }
+    .pass-wrap { position: relative; }
+    .pass-toggle {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      background: none; border: none; cursor: pointer; font-size: 16px; padding: 0;
+    }
 
     .btn-cyan {
       width: 100%; padding: 13px;
@@ -144,35 +147,28 @@ export class LoginComponent {
   private api = inject(ApiService);
   private router = inject(Router);
 
-  phone = '';
-  otp = '';
-  otpSent = signal(false);
+  username = '';
+  password = '';
+  showPass = false;
   loading = signal(false);
   error = signal('');
 
-  sendOtp() {
+  login() {
+    if (!this.username || !this.password) {
+      this.error.set('Ingresa usuario y contraseña');
+      return;
+    }
     this.error.set('');
     this.loading.set(true);
-    this.api.sendOtp(this.phone).subscribe({
-      next: () => { this.otpSent.set(true); this.loading.set(false); },
-      error: (e) => { this.error.set(e.error?.message ?? 'Error enviando código'); this.loading.set(false); },
-    });
-  }
-
-  verifyOtp() {
-    this.error.set('');
-    this.loading.set(true);
-    this.api.verifyOtp(this.phone, this.otp).subscribe({
+    this.api.adminLogin(this.username, this.password).subscribe({
       next: (res) => {
-        if (res.user.role !== 'ADMIN') {
-          this.error.set('No tienes permisos de administrador');
-          this.loading.set(false);
-          return;
-        }
         localStorage.setItem('token', res.accessToken);
         this.router.navigate(['/drivers']);
       },
-      error: (e) => { this.error.set(e.error?.message ?? 'Código inválido'); this.loading.set(false); },
+      error: (e) => {
+        this.error.set(e.error?.message ?? 'Usuario o contraseña incorrectos');
+        this.loading.set(false);
+      },
     });
   }
 }

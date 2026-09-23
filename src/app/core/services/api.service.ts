@@ -153,13 +153,9 @@ export class ApiService {
   }
 
   // Auth
-  sendOtp(phone: string) {
-    return this.http.post(`${this.base}/auth/send-otp`, { phone });
-  }
-
-  verifyOtp(phone: string, token: string) {
+  adminLogin(username: string, password: string) {
     return this.http.post<{ accessToken: string; user: { role: string } }>(
-      `${this.base}/auth/verify-otp`, { phone, token }
+      `${this.base}/auth/admin-login`, { username, password }
     );
   }
 
