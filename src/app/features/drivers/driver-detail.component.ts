@@ -1,12 +1,13 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { DecimalPipe, DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { ApiService, Driver } from '../../core/services/api.service';
 
 @Component({
   selector: 'app-driver-detail',
   standalone: true,
-  imports: [RouterLink, DecimalPipe, DatePipe],
+  imports: [RouterLink, DecimalPipe, DatePipe, FormsModule],
   template: `
     <div class="page-container">
       <a class="back-link" routerLink="/drivers">
@@ -54,7 +55,21 @@ import { ApiService, Driver } from '../../core/services/api.service';
               @if (driver()!.status === 'SUSPENDED') {
                 <button class="btn-cyan" (click)="setStatus('APPROVED')">Reactivar</button>
               }
+              <button class="btn-ghost" (click)="showPwdForm.set(!showPwdForm())">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                Contraseña
+              </button>
             </div>
+
+            @if (showPwdForm()) {
+              <div class="pwd-form" style="grid-column:1/-1">
+                <input class="mv-input" type="password" [(ngModel)]="newPassword" placeholder="Nueva contraseña" />
+                <button class="btn-cyan" (click)="resetPassword()" [disabled]="savingPwd() || newPassword.length < 6">
+                  {{ savingPwd() ? 'Guardando…' : 'Guardar' }}
+                </button>
+                <button class="btn-ghost" (click)="showPwdForm.set(false); newPassword=''">Cancelar</button>
+              </div>
+            }
 
             @if (toast()) {
               <div class="toast" [class.toast-error]="toastError()">{{ toast() }}</div>
@@ -163,7 +178,21 @@ import { ApiService, Driver } from '../../core/services/api.service';
 
     .action-row {
       grid-column: 1 / -1; display: flex; gap: 12px; padding-top: 16px;
-      border-top: 1px solid #1e1e1e; margin-top: 8px;
+      border-top: 1px solid #1e1e1e; margin-top: 8px; flex-wrap: wrap;
+    }
+
+    .btn-ghost {
+      padding: 7px 14px; border-radius: 8px; background: transparent;
+      border: 1px solid #2a2a2a; color: #888; font-size: 13px; font-weight: 600;
+      cursor: pointer; display: flex; align-items: center; gap: 6px;
+      transition: border-color .2s, color .2s;
+      &:hover { border-color: #444; color: #ccc; }
+    }
+
+    .pwd-form {
+      display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
+      padding: 14px 0 4px; border-top: 1px solid #1a1a1a;
+      .mv-input { max-width: 220px; }
     }
 
     .toast {
@@ -231,6 +260,9 @@ export class DriverDetailComponent implements OnInit {
   loading = signal(true);
   toast = signal('');
   toastError = signal(false);
+  showPwdForm = signal(false);
+  savingPwd = signal(false);
+  newPassword = '';
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id')!;
@@ -290,6 +322,23 @@ export class DriverDetailComponent implements OnInit {
         this.showToast('Documento verificado', false);
       },
       error: () => this.showToast('Error verificando documento', true),
+    });
+  }
+
+  resetPassword() {
+    if (this.newPassword.length < 6) return;
+    this.savingPwd.set(true);
+    this.api.resetDriverPassword(this.driver()!.id, this.newPassword).subscribe({
+      next: () => {
+        this.savingPwd.set(false);
+        this.showPwdForm.set(false);
+        this.newPassword = '';
+        this.showToast('Contraseña actualizada correctamente', false);
+      },
+      error: () => {
+        this.savingPwd.set(false);
+        this.showToast('Error al actualizar la contraseña', true);
+      },
     });
   }
 

@@ -179,6 +179,10 @@ export class ApiService {
     return this.http.patch(`${this.base}/admin/drivers/${id}/status`, { status }, { headers: this.headers });
   }
 
+  resetDriverPassword(id: string, password: string) {
+    return this.http.patch(`${this.base}/admin/drivers/${id}/reset-password`, { password }, { headers: this.headers });
+  }
+
   // Admin — documents
   verifyDocument(id: string, isVerified: boolean) {
     return this.http.patch(`${this.base}/admin/documents/${id}/verify`, { isVerified }, { headers: this.headers });
