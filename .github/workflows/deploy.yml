@@ -23,7 +23,7 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - run: npx ng build --base-href /movit-admin/
+      - run: npx ng build --configuration production --base-href /movit-admin/
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist/movit-admin/browser
