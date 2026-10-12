@@ -154,6 +154,21 @@ export interface Campaign {
   createdAt: string;
 }
 
+export interface DriverPayment {
+  id: string;
+  driverId: string;
+  type: 'INGRESO' | 'RODAMIENTO';
+  amount: number;
+  weekStart?: string;
+  status: 'PENDING' | 'CONFIRMED' | 'REJECTED';
+  confirmedAt?: string;
+  notes?: string;
+  createdAt: string;
+  driver: {
+    user: { firstName: string; lastName: string; phone: string };
+  };
+}
+
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private http = inject(HttpClient);
@@ -291,6 +306,23 @@ export class ApiService {
 
   deleteAd(id: string) {
     return this.http.delete(`${this.base}/ads/${id}`, { headers: this.headers });
+  }
+
+  // Driver payments
+  getDriverPayments() {
+    return this.http.get<DriverPayment[]>(`${this.base}/driver-payments`, { headers: this.headers });
+  }
+
+  getPendingDriverPayments() {
+    return this.http.get<DriverPayment[]>(`${this.base}/driver-payments/pending`, { headers: this.headers });
+  }
+
+  confirmDriverPayment(id: string) {
+    return this.http.patch<DriverPayment>(`${this.base}/driver-payments/${id}/confirm`, {}, { headers: this.headers });
+  }
+
+  rejectDriverPayment(id: string, notes?: string) {
+    return this.http.patch<DriverPayment>(`${this.base}/driver-payments/${id}/reject`, { notes }, { headers: this.headers });
   }
 
   // Admin — ratings
