@@ -10,7 +10,7 @@ export interface Driver {
   rating: number;
   totalTrips: number;
   createdAt: string;
-  user: { firstName: string; lastName: string; phone: string; email: string; photoUrl?: string };
+  user: { firstName: string; lastName: string; phone: string; email: string; photoUrl?: string; termsAcceptedAt?: string | null };
   documents: Document[];
   vehicles: Vehicle[];
 }

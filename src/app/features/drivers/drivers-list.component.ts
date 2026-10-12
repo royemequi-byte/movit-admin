@@ -1,12 +1,13 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { DatePipe } from '@angular/common';
 import { ApiService, Driver } from '../../core/services/api.service';
 
 @Component({
   selector: 'app-drivers-list',
   standalone: true,
-  imports: [RouterLink, FormsModule],
+  imports: [RouterLink, FormsModule, DatePipe],
   template: `
     <div class="page-container">
       <div class="page-header">
@@ -35,6 +36,7 @@ import { ApiService, Driver } from '../../core/services/api.service';
                 <th>Conductor/a</th>
                 <th>Teléfono</th>
                 <th>Estado</th>
+                <th>Datos</th>
                 <th>Docs</th>
                 <th>Vehículos</th>
                 <th></th>
@@ -49,6 +51,13 @@ import { ApiService, Driver } from '../../core/services/api.service';
                   </td>
                   <td>{{ d.user.phone }}</td>
                   <td><span class="status-badge {{ d.status }}">{{ statusLabel(d.status) }}</span></td>
+                  <td>
+                    @if (d.user.termsAcceptedAt) {
+                      <span class="terms-ok" title="{{ d.user.termsAcceptedAt | date:'dd/MM/yyyy HH:mm' }}">✓ {{ d.user.termsAcceptedAt | date:'dd/MM/yy' }}</span>
+                    } @else {
+                      <span class="terms-no">Pendiente</span>
+                    }
+                  </td>
                   <td>{{ d.documents.length }}</td>
                   <td>{{ d.vehicles.length }}</td>
                   <td>
@@ -69,6 +78,8 @@ import { ApiService, Driver } from '../../core/services/api.service';
     }
     .driver-name { font-weight: 500; }
     .driver-email { font-size: 12px; color: #666; margin-top: 2px; }
+    .terms-ok { color: #22c55e; font-size: 12px; font-weight: 500; }
+    .terms-no { color: #f59e0b; font-size: 12px; }
     .btn-view {
       padding: 6px 14px; border-radius: 6px;
       background: rgba(0,212,232,.1); color: #00d4e8;
