@@ -160,8 +160,10 @@ export interface DriverPayment {
   type: 'INGRESO' | 'RODAMIENTO';
   amount: number;
   weekStart?: string;
+  referenceNumber?: string;
   status: 'PENDING' | 'CONFIRMED' | 'REJECTED';
   confirmedAt?: string;
+  confirmedBy?: string;
   notes?: string;
   createdAt: string;
   driver: {
