@@ -325,6 +325,10 @@ export class ApiService {
     return this.http.patch<DriverPayment>(`${this.base}/driver-payments/${id}/reject`, { notes }, { headers: this.headers });
   }
 
+  createDriverIngreso(driverId: string) {
+    return this.http.post<DriverPayment>(`${this.base}/driver-payments/admin/ingreso/${driverId}`, {}, { headers: this.headers });
+  }
+
   // Admin — ratings
   getRatings(page = 1, limit = 20) {
     const params = new HttpParams().set('page', page).set('limit', limit);

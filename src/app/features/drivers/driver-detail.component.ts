@@ -55,6 +55,9 @@ import { ApiService, Driver } from '../../core/services/api.service';
               @if (driver()!.status === 'SUSPENDED') {
                 <button class="btn-cyan" (click)="setStatus('APPROVED')">Reactivar</button>
               }
+              <button class="btn-ingreso" (click)="registrarIngreso()">
+                💳 Registrar ingreso
+              </button>
               <button class="btn-ghost" (click)="showPwdForm.set(!showPwdForm())">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                 Contraseña
@@ -187,6 +190,14 @@ import { ApiService, Driver } from '../../core/services/api.service';
       cursor: pointer; display: flex; align-items: center; gap: 6px;
       transition: border-color .2s, color .2s;
       &:hover { border-color: #444; color: #ccc; }
+    }
+
+    .btn-ingreso {
+      padding: 7px 14px; border-radius: 8px;
+      background: rgba(255,171,0,.1); border: 1px solid rgba(255,171,0,.3);
+      color: #ffab00; font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: background .2s;
+      &:hover { background: rgba(255,171,0,.2); }
     }
 
     .pwd-form {
@@ -339,6 +350,15 @@ export class DriverDetailComponent implements OnInit {
         this.savingPwd.set(false);
         this.showToast('Error al actualizar la contraseña', true);
       },
+    });
+  }
+
+  registrarIngreso() {
+    const d = this.driver();
+    if (!d) return;
+    this.api.createDriverIngreso(d.id).subscribe({
+      next: () => this.showToast('Pago de ingreso registrado. Ve a Pagos para confirmarlo.', false),
+      error: () => this.showToast('Error registrando el pago de ingreso', true),
     });
   }
 
