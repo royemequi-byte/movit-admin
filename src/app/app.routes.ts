@@ -19,6 +19,7 @@ export const routes: Routes = [
       { path: 'campanas', loadComponent: () => import('./features/campanas/campanas.component').then(m => m.CampanasComponent) },
       { path: 'mapa', loadComponent: () => import('./features/mapa/mapa.component').then(m => m.MapaComponent) },
       { path: 'calificaciones', loadComponent: () => import('./features/calificaciones/calificaciones.component').then(m => m.CalificacionesComponent) },
+      { path: 'publicidad', loadComponent: () => import('./features/publicidad/publicidad.component').then(m => m.PublicidadComponent) },
       { path: 'config', loadComponent: () => import('./features/config/config.component').then(m => m.ConfigComponent) },
     ],
   },

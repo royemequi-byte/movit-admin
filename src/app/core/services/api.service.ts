@@ -2,6 +2,18 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 
+export interface Ad {
+  id: string;
+  title: string;
+  description?: string;
+  imageUrl?: string;
+  linkUrl?: string;
+  isActive: boolean;
+  startsAt?: string;
+  endsAt?: string;
+  createdAt: string;
+}
+
 export interface Driver {
   id: string;
   userId: string;
@@ -262,6 +274,23 @@ export class ApiService {
   // Admin — live map
   getLiveMap() {
     return this.http.get<{ drivers: LiveDriver[]; trips: LiveTrip[] }>(`${this.base}/admin/live-map`, { headers: this.headers });
+  }
+
+  // Ads
+  getAds() {
+    return this.http.get<Ad[]>(`${this.base}/ads`, { headers: this.headers });
+  }
+
+  createAd(data: Partial<Ad>) {
+    return this.http.post<Ad>(`${this.base}/ads`, data, { headers: this.headers });
+  }
+
+  updateAd(id: string, data: Partial<Ad>) {
+    return this.http.patch<Ad>(`${this.base}/ads/${id}`, data, { headers: this.headers });
+  }
+
+  deleteAd(id: string) {
+    return this.http.delete(`${this.base}/ads/${id}`, { headers: this.headers });
   }
 
   // Admin — ratings
