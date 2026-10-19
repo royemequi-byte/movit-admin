@@ -148,7 +148,12 @@ interface Week { label: string; monday: Date; sunday: Date; }
                         <button class="btn-reject-sm" (click)="reject(p.id)">✕</button>
                       </div>
                     } @else if (p.status === 'CONFIRMED') {
-                      <span class="confirmed-label">Confirmado ✓</span>
+                      <div class="actions-cell">
+                        <span class="confirmed-label">Confirmado ✓</span>
+                        @if (p.driver.status === 'SUSPENDED_PAYMENT') {
+                          <button class="btn-reactivate-sm" (click)="reactivateOne(p.driver.id)">↺ Reactivar</button>
+                        }
+                      </div>
                     } @else {
                       <span class="rejected-label">Rechazado</span>
                     }
