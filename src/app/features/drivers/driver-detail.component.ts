@@ -557,7 +557,7 @@ export class DriverDetailComponent implements OnInit {
       next: () => {
         this.registeringIngreso.set(false);
         this.loadPayments();
-        this.showToast('Afiliación registrada — $150.000 pendiente de pago', false);
+        this.showToast('Afiliación registrada y confirmada ✓', false);
       },
       error: () => { this.registeringIngreso.set(false); this.showToast('Error registrando afiliación', true); },
     });
@@ -571,7 +571,7 @@ export class DriverDetailComponent implements OnInit {
       next: () => {
         this.registeringWeek.set(false);
         this.loadPayments();
-        this.showToast('Semana registrada — $50.000 pendiente de pago', false);
+        this.showToast('Semana registrada y confirmada ✓', false);
       },
       error: () => { this.registeringWeek.set(false); this.showToast('Error registrando semana', true); },
     });
