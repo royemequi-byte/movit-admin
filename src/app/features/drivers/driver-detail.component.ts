@@ -162,9 +162,16 @@ import { ApiService, Driver, DriverPayment } from '../../core/services/api.servi
                 <div class="pstat-label">Total pagado</div>
               </div>
             </div>
-            <button class="btn-register" (click)="registrarSemana()">
-              {{ registeringWeek() ? 'Registrando…' : '＋ Registrar semana' }}
-            </button>
+            <div class="register-btns">
+              @if (!ingresoExists()) {
+                <button class="btn-ingreso" (click)="registrarIngreso()">
+                  {{ registeringIngreso() ? 'Registrando…' : '💳 Registrar afiliación $150k' }}
+                </button>
+              }
+              <button class="btn-register" (click)="registrarSemana()">
+                {{ registeringWeek() ? 'Registrando…' : '＋ Registrar semana $50k' }}
+              </button>
+            </div>
           </div>
 
           @if (loadingPayments()) {
@@ -359,11 +366,18 @@ import { ApiService, Driver, DriverPayment } from '../../core/services/api.servi
     .pstat-box .pstat-val.green { color: #00d464; }
     .pstat-box .pstat-label { font-size: 10px; color: #444; margin-top: 3px; text-transform: uppercase; letter-spacing: .4px; }
 
+    .register-btns { display: flex; gap: 8px; flex-wrap: wrap; }
     .btn-register {
       padding: 10px 18px; border-radius: 8px; background: rgba(0,212,232,.1);
       border: 1px solid rgba(0,212,232,.3); color: #00d4e8; font-size: 13px;
       font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; white-space: nowrap;
       &:hover { background: rgba(0,212,232,.2); }
+    }
+    .btn-ingreso {
+      padding: 10px 18px; border-radius: 8px; background: rgba(255,171,0,.1);
+      border: 1px solid rgba(255,171,0,.3); color: #ffab00; font-size: 13px;
+      font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; white-space: nowrap;
+      &:hover { background: rgba(255,171,0,.2); }
     }
 
     .type-pill {
@@ -424,8 +438,10 @@ export class DriverDetailComponent implements OnInit {
   payments = signal<DriverPayment[]>([]);
   loadingPayments = signal(false);
   registeringWeek = signal(false);
+  registeringIngreso = signal(false);
 
   // ── Computed pagos ────────────────────────────────────────────────────────
+  ingresoExists = computed(() => this.payments().some(p => p.type === 'INGRESO'));
   ingresoConfirmed = computed(() => this.payments().some(p => p.type === 'INGRESO' && p.status === 'CONFIRMED'));
   rodamientosConfirmed = computed(() => this.payments().filter(p => p.type === 'RODAMIENTO' && p.status === 'CONFIRMED').length);
   pendingPayments = computed(() => this.payments().filter(p => p.status === 'PENDING').length);
@@ -530,6 +546,20 @@ export class DriverDetailComponent implements OnInit {
         this.showToast('Contraseña actualizada', false);
       },
       error: () => { this.savingPwd.set(false); this.showToast('Error al actualizar contraseña', true); },
+    });
+  }
+
+  registrarIngreso() {
+    const id = this.driver()?.id;
+    if (!id) return;
+    this.registeringIngreso.set(true);
+    this.api.createDriverIngreso(id).subscribe({
+      next: () => {
+        this.registeringIngreso.set(false);
+        this.loadPayments();
+        this.showToast('Afiliación registrada — $150.000 pendiente de pago', false);
+      },
+      error: () => { this.registeringIngreso.set(false); this.showToast('Error registrando afiliación', true); },
     });
   }
 
