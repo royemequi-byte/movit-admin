@@ -337,6 +337,10 @@ export class ApiService {
     return this.http.post<DriverPayment>(`${this.base}/driver-payments/admin/rodamiento/${driverId}`, {}, { headers: this.headers });
   }
 
+  getDriverPaymentsByDriverId(driverId: string) {
+    return this.http.get<DriverPayment[]>(`${this.base}/driver-payments/admin/driver/${driverId}`, { headers: this.headers });
+  }
+
   reactivateDriver(driverId: string) {
     return this.http.post(`${this.base}/driver-payments/admin/reactivate/${driverId}`, {}, { headers: this.headers });
   }

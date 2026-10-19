@@ -20,6 +20,7 @@ import { ApiService, Driver } from '../../core/services/api.service';
           <option value="PENDING">Pendientes</option>
           <option value="APPROVED">Aprobados/as</option>
           <option value="SUSPENDED">Suspendidos/as</option>
+          <option value="SUSPENDED_PAYMENT">Bloqueados/as (pago)</option>
           <option value="REJECTED">Rechazados/as</option>
         </select>
       </div>
@@ -110,8 +111,9 @@ export class DriversListComponent implements OnInit {
 
   statusLabel(s: string) {
     const map: Record<string, string> = {
-      PENDING: 'Pendiente', APPROVED: 'Aprobado/a',
+      PENDING: 'Pendiente', APPROVED: 'Activo/a',
       SUSPENDED: 'Suspendido/a', REJECTED: 'Rechazado/a',
+      SUSPENDED_PAYMENT: 'Bloqueado/a',
     };
     return map[s] ?? s;
   }
