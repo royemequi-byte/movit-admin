@@ -1,7 +1,7 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ApiService, DriverPayment } from '../../core/services/api.service';
+import { ApiService, DriverPayment, Driver } from '../../core/services/api.service';
 
 interface Week { label: string; monday: Date; sunday: Date; }
 
@@ -42,28 +42,45 @@ interface Week { label: string; monday: Date; sunday: Date; }
       </div>
 
       <!-- Tabs -->
-      <div class="tabs">
-        <button class="tab-btn" [class.active]="tab() === 'ingreso'" (click)="tab.set('ingreso')">
-          <span class="tab-icon ingreso">💳</span>
-          <span class="tab-info">
-            <span class="tab-label">Inscripción</span>
-            <span class="tab-desc">Pago único · $150.000</span>
-          </span>
-          @if (pendingIngreso() > 0) {
-            <span class="tab-count">{{ pendingIngreso() }}</span>
-          }
-        </button>
-        <button class="tab-btn" [class.active]="tab() === 'rodamiento'" (click)="tab.set('rodamiento')">
-          <span class="tab-icon rodamiento">🔄</span>
-          <span class="tab-info">
-            <span class="tab-label">Control Semanal</span>
-            <span class="tab-desc">Rodamiento · $50.000</span>
-          </span>
-          @if (pendingRodamiento() > 0) {
-            <span class="tab-count">{{ pendingRodamiento() }}</span>
-          }
-        </button>
+      <div class="tabs-row">
+        <div class="tabs">
+          <button class="tab-btn" [class.active]="tab() === 'ingreso'" (click)="tab.set('ingreso')">
+            <span class="tab-icon ingreso">💳</span>
+            <span class="tab-info">
+              <span class="tab-label">Inscripción</span>
+              <span class="tab-desc">Pago único · $150.000</span>
+            </span>
+            @if (pendingIngreso() > 0) {
+              <span class="tab-count">{{ pendingIngreso() }}</span>
+            }
+          </button>
+          <button class="tab-btn" [class.active]="tab() === 'rodamiento'" (click)="tab.set('rodamiento')">
+            <span class="tab-icon rodamiento">🔄</span>
+            <span class="tab-info">
+              <span class="tab-label">Control Semanal</span>
+              <span class="tab-desc">Rodamiento · $50.000</span>
+            </span>
+            @if (pendingRodamiento() > 0) {
+              <span class="tab-count">{{ pendingRodamiento() }}</span>
+            }
+          </button>
+        </div>
+        @if (tab() === 'rodamiento') {
+          <button class="btn-register-week" (click)="openRegisterModal()">
+            ＋ Registrar semana
+          </button>
+        }
       </div>
+
+      <!-- Banner bloqueados -->
+      @if (tab() === 'rodamiento' && suspendedDriverIds().length > 0) {
+        <div class="suspended-banner">
+          <span>⚠ {{ suspendedDriverIds().length }} conductor{{ suspendedDriverIds().length > 1 ? 'es bloqueados' : ' bloqueado' }}</span>
+          <button class="btn-reactivate-all" (click)="reactivateAll()" [disabled]="reactivating()">
+            {{ reactivating() ? 'Reactivando…' : 'Reactivar todos' }}
+          </button>
+        </div>
+      }
 
       @if (error()) {
         <div class="error-box">{{ error() }}</div>
@@ -104,7 +121,12 @@ interface Week { label: string; monday: Date; sunday: Date; }
                     <div class="driver-cell">
                       <div class="driver-avatar">{{ initials(p) }}</div>
                       <div>
-                        <div class="driver-name">{{ p.driver.user.firstName }} {{ p.driver.user.lastName }}</div>
+                        <div class="driver-name-row">
+                          <span class="driver-name">{{ p.driver.user.firstName }} {{ p.driver.user.lastName }}</span>
+                          <span class="status-badge" [class.active]="p.driver.status === 'APPROVED'" [class.blocked]="p.driver.status === 'SUSPENDED_PAYMENT'">
+                            {{ p.driver.status === 'APPROVED' ? '● Activo' : p.driver.status === 'SUSPENDED_PAYMENT' ? '● Bloqueado' : p.driver.status === 'PENDING' ? '● Pendiente' : '● Inactivo' }}
+                          </span>
+                        </div>
                         <div class="driver-phone">{{ p.driver.user.phone }}</div>
                       </div>
                     </div>
@@ -182,7 +204,12 @@ interface Week { label: string; monday: Date; sunday: Date; }
                     <div class="driver-cell">
                       <div class="driver-avatar">{{ initials(p) }}</div>
                       <div>
-                        <div class="driver-name">{{ p.driver.user.firstName }} {{ p.driver.user.lastName }}</div>
+                        <div class="driver-name-row">
+                          <span class="driver-name">{{ p.driver.user.firstName }} {{ p.driver.user.lastName }}</span>
+                          <span class="status-badge" [class.active]="p.driver.status === 'APPROVED'" [class.blocked]="p.driver.status === 'SUSPENDED_PAYMENT'">
+                            {{ p.driver.status === 'APPROVED' ? '● Activo' : p.driver.status === 'SUSPENDED_PAYMENT' ? '● Bloqueado' : p.driver.status === 'PENDING' ? '● Pendiente' : '● Inactivo' }}
+                          </span>
+                        </div>
                         <div class="driver-phone">{{ p.driver.user.phone }}</div>
                       </div>
                     </div>
@@ -209,9 +236,19 @@ interface Week { label: string; monday: Date; sunday: Date; }
                         <button class="btn-reject-sm" (click)="reject(p.id)">✕</button>
                       </div>
                     } @else if (p.status === 'CONFIRMED') {
-                      <span class="confirmed-label">Confirmado ✓</span>
+                      <div class="actions-cell">
+                        <span class="confirmed-label">Confirmado ✓</span>
+                        @if (p.driver.status === 'SUSPENDED_PAYMENT') {
+                          <button class="btn-reactivate-sm" (click)="reactivateOne(p.driver.id)">↺ Reactivar</button>
+                        }
+                      </div>
                     } @else {
-                      <span class="rejected-label">Rechazado</span>
+                      <div class="actions-cell">
+                        <span class="rejected-label">Rechazado</span>
+                        @if (p.driver.status === 'SUSPENDED_PAYMENT') {
+                          <button class="btn-reactivate-sm" (click)="reactivateOne(p.driver.id)">↺ Reactivar</button>
+                        }
+                      </div>
                     }
                   </td>
                 </tr>
@@ -223,6 +260,50 @@ interface Week { label: string; monday: Date; sunday: Date; }
         </div>
       }
     </div>
+
+    <!-- Modal registrar semana -->
+    @if (registerModal()) {
+      <div class="modal-overlay" (click)="closeRegisterModal()">
+        <div class="modal" (click)="$event.stopPropagation()">
+          <div class="modal-title">REGISTRAR SEMANA</div>
+          <div class="modal-sub">Crea el cobro de $50.000 para la semana actual · {{ currentWeekLabel() }}</div>
+
+          <div class="driver-search-wrap">
+            <input class="modal-input" type="text" placeholder="Buscar conductor por nombre…"
+              [(ngModel)]="driverSearch" style="margin-bottom:10px">
+          </div>
+
+          <div class="driver-list">
+            @for (d of filteredRegisterDrivers(); track d.id) {
+              <div class="driver-option" [class.selected]="selectedDriverId() === d.id"
+                (click)="selectedDriverId.set(d.id)">
+                <div class="driver-avatar" style="width:32px;height:32px;font-size:11px">
+                  {{ d.user.firstName[0] }}{{ d.user.lastName[0] }}
+                </div>
+                <div>
+                  <div class="driver-name">{{ d.user.firstName }} {{ d.user.lastName }}</div>
+                  <div class="driver-phone">{{ d.user.phone }}</div>
+                </div>
+                <span class="status-badge ml-auto" [class.active]="d.status === 'APPROVED'" [class.blocked]="d.status === 'SUSPENDED_PAYMENT'">
+                  {{ d.status === 'APPROVED' ? '● Activo' : '● Bloqueado' }}
+                </span>
+              </div>
+            } @empty {
+              <div style="color:#333;text-align:center;padding:24px;font-size:13px">
+                {{ loadingDrivers() ? 'Cargando conductores…' : 'No hay conductores activos' }}
+              </div>
+            }
+          </div>
+
+          <div class="modal-actions" style="margin-top:16px">
+            <button class="modal-btn-confirm" (click)="confirmRegister()" [disabled]="!selectedDriverId() || registering()">
+              {{ registering() ? 'Registrando…' : '＋ Registrar $50.000' }}
+            </button>
+            <button class="modal-btn-cancel" (click)="closeRegisterModal()">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    }
 
     <!-- Modal confirmar -->
     @if (modalPayment()) {
@@ -284,8 +365,9 @@ interface Week { label: string; monday: Date; sunday: Date; }
     .stat-val.green { color: #00d464; }
     .stat-label { font-size: 11px; color: #444; margin-top: 4px; text-transform: uppercase; letter-spacing: .5px; }
 
-    /* Tabs */
-    .tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+    /* Tabs row */
+    .tabs-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
+    .tabs { display: flex; gap: 10px; flex-wrap: wrap; }
     .tab-btn {
       display: flex; align-items: center; gap: 12px;
       padding: 12px 18px; border-radius: 10px;
@@ -300,6 +382,48 @@ interface Week { label: string; monday: Date; sunday: Date; }
     .tab-desc { font-size: 11px; color: #444; margin-top: 2px; }
     .tab-btn.active .tab-desc { color: rgba(0,212,232,.5); }
     .tab-count { background: #ff4444; color: #fff; border-radius: 99px; font-size: 10px; font-weight: 700; padding: 2px 7px; margin-left: 4px; }
+
+    .btn-register-week {
+      padding: 10px 18px; border-radius: 8px; background: rgba(0,212,232,.1);
+      border: 1px solid rgba(0,212,232,.3); color: #00d4e8; font-size: 13px;
+      font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; white-space: nowrap;
+      &:hover { background: rgba(0,212,232,.2); }
+    }
+    .suspended-banner {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      background: rgba(255,68,68,.07); border: 1px solid rgba(255,68,68,.2);
+      border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; font-size: 13px; color: #ff8888;
+    }
+    .btn-reactivate-all {
+      padding: 7px 16px; border-radius: 6px; background: rgba(0,212,100,.1);
+      border: 1px solid rgba(0,212,100,.25); color: #00d464; font-size: 12px;
+      font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; white-space: nowrap;
+      &:disabled { opacity: .5; cursor: default; }
+      &:not(:disabled):hover { background: rgba(0,212,100,.2); }
+    }
+    .btn-reactivate-sm {
+      padding: 4px 10px; border-radius: 6px; background: rgba(0,212,100,.08);
+      border: 1px solid rgba(0,212,100,.2); color: #00d464; font-size: 11px;
+      font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; white-space: nowrap;
+      &:hover { background: rgba(0,212,100,.18); }
+    }
+    .driver-name-row { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+    .status-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; white-space: nowrap; }
+    .status-badge.active { color: #00d464; background: rgba(0,212,100,.1); border: 1px solid rgba(0,212,100,.2); }
+    .status-badge.blocked { color: #ff6666; background: rgba(255,68,68,.1); border: 1px solid rgba(255,68,68,.2); }
+    .status-badge:not(.active):not(.blocked) { color: #ffab00; background: rgba(255,171,0,.1); border: 1px solid rgba(255,171,0,.2); }
+    .ml-auto { margin-left: auto; }
+
+    /* Driver list modal */
+    .driver-list { max-height: 260px; overflow-y: auto; border: 1px solid #1a1a1a; border-radius: 10px; }
+    .driver-option {
+      display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+      cursor: pointer; border-bottom: 1px solid #0f0f0f; transition: background .1s;
+      &:last-child { border-bottom: none; }
+      &:hover { background: rgba(255,255,255,.03); }
+      &.selected { background: rgba(0,212,232,.06); border-left: 2px solid #00d4e8; }
+    }
+    .driver-search-wrap { margin-bottom: 4px; }
 
     .error-box { background: rgba(255,68,68,.1); border: 1px solid rgba(255,68,68,.3); border-radius: 8px; padding: 12px 16px; color: #ff6666; margin-bottom: 20px; font-size: 13px; }
 
@@ -437,6 +561,17 @@ export class PagosComponent implements OnInit {
   modalPayment = signal<DriverPayment | null>(null);
   modalNote = '';
 
+  // Registro semana
+  registerModal = signal(false);
+  drivers = signal<Driver[]>([]);
+  loadingDrivers = signal(false);
+  selectedDriverId = signal<string | null>(null);
+  registering = signal(false);
+  driverSearch = '';
+
+  // Reactivar
+  reactivating = signal(false);
+
   searchIngreso = '';
   statusFilterIngreso = '';
   searchRodamiento = '';
@@ -478,6 +613,31 @@ export class PagosComponent implements OnInit {
       return matchSearch && matchStatus;
     });
   });
+
+  suspendedDriverIds = computed(() => {
+    const seen = new Set<string>();
+    return this.all()
+      .filter(p => p.driver.status === 'SUSPENDED_PAYMENT' && !seen.has(p.driver.id) && seen.add(p.driver.id))
+      .map(p => p.driver.id);
+  });
+
+  filteredRegisterDrivers = computed(() => {
+    const search = this.driverSearch.toLowerCase();
+    return this.drivers().filter(d => {
+      if (d.status !== 'APPROVED' && d.status !== 'SUSPENDED_PAYMENT') return false;
+      if (!search) return true;
+      return `${d.user.firstName} ${d.user.lastName}`.toLowerCase().includes(search) ||
+        d.user.phone.includes(search);
+    });
+  });
+
+  currentWeekLabel() {
+    const monday = this.getWeekStart(new Date());
+    const sunday = new Date(monday);
+    sunday.setDate(monday.getDate() + 6);
+    const fmt = (d: Date) => d.toLocaleDateString('es-CO', { day: '2-digit', month: '2-digit' });
+    return `${fmt(monday)} – ${fmt(sunday)}`;
+  }
 
   filteredRodamiento = computed(() => {
     const search = this.searchRodamiento.toLowerCase();
@@ -545,6 +705,61 @@ export class PagosComponent implements OnInit {
     this.api.rejectDriverPayment(id).subscribe({
       next: () => this.load(),
       error: () => this.error.set('Error rechazando pago'),
+    });
+  }
+
+  openRegisterModal() {
+    this.selectedDriverId.set(null);
+    this.driverSearch = '';
+    this.registerModal.set(true);
+    if (this.drivers().length === 0) {
+      this.loadingDrivers.set(true);
+      this.api.getDrivers().subscribe({
+        next: d => { this.drivers.set(d); this.loadingDrivers.set(false); },
+        error: () => this.loadingDrivers.set(false),
+      });
+    }
+  }
+
+  closeRegisterModal() {
+    this.registerModal.set(false);
+  }
+
+  confirmRegister() {
+    const id = this.selectedDriverId();
+    if (!id) return;
+    this.registering.set(true);
+    this.api.createDriverRodamiento(id).subscribe({
+      next: () => {
+        this.registering.set(false);
+        this.closeRegisterModal();
+        this.load();
+        this.tab.set('rodamiento');
+      },
+      error: () => {
+        this.registering.set(false);
+        this.error.set('Error registrando rodamiento');
+      },
+    });
+  }
+
+  reactivateOne(driverId: string) {
+    this.api.reactivateDriver(driverId).subscribe({
+      next: () => this.load(),
+      error: () => this.error.set('Error reactivando conductor'),
+    });
+  }
+
+  reactivateAll() {
+    const ids = this.suspendedDriverIds();
+    if (ids.length === 0) return;
+    this.reactivating.set(true);
+    let pending = ids.length;
+    ids.forEach(id => {
+      this.api.reactivateDriver(id).subscribe({
+        next: () => { if (--pending === 0) { this.reactivating.set(false); this.load(); } },
+        error: () => { if (--pending === 0) { this.reactivating.set(false); this.load(); } },
+      });
     });
   }
 

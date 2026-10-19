@@ -17,7 +17,7 @@ export interface Ad {
 export interface Driver {
   id: string;
   userId: string;
-  status: 'PENDING' | 'APPROVED' | 'SUSPENDED' | 'REJECTED';
+  status: 'PENDING' | 'APPROVED' | 'SUSPENDED' | 'SUSPENDED_PAYMENT' | 'REJECTED';
   isAvailable: boolean;
   rating: number;
   totalTrips: number;
@@ -167,6 +167,8 @@ export interface DriverPayment {
   notes?: string;
   createdAt: string;
   driver: {
+    id: string;
+    status: string;
     user: { firstName: string; lastName: string; phone: string };
   };
 }
@@ -329,6 +331,14 @@ export class ApiService {
 
   createDriverIngreso(driverId: string) {
     return this.http.post<DriverPayment>(`${this.base}/driver-payments/admin/ingreso/${driverId}`, {}, { headers: this.headers });
+  }
+
+  createDriverRodamiento(driverId: string) {
+    return this.http.post<DriverPayment>(`${this.base}/driver-payments/admin/rodamiento/${driverId}`, {}, { headers: this.headers });
+  }
+
+  reactivateDriver(driverId: string) {
+    return this.http.post(`${this.base}/driver-payments/admin/reactivate/${driverId}`, {}, { headers: this.headers });
   }
 
   // Admin — ratings
